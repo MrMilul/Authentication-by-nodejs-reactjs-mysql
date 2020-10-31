@@ -16,6 +16,22 @@ const db = mysql.createPool({
 })
 
 
-app.get('/', (req, res)=>{
-    res.send('hello guys')
-}).listen('3001')
+app.post('/register', (req, res)=>{
+
+    const username = req.body.username;
+    const f_name = req.body.f_name;
+    const l_name = req.body.l_name;
+    const email = req.body.email;
+    const password = req.body.password;
+
+   const insertQuery = "INSERT INTO register (username, f_name, l_name, Email, password) VALUES (?, ?, ?, ?, ?)"
+
+   db.query(insertQuery, [username, f_name, l_name, email, password], (err, result)=>{
+       if (err){
+           console.log(err)
+       }
+   })
+    
+})
+
+app.listen('3001', ()=>{console.log('we are on the localhost:3001')})
