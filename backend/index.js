@@ -24,14 +24,33 @@ app.post('/register', (req, res)=>{
     const email = req.body.email;
     const password = req.body.password;
 
-   const insertQuery = "INSERT INTO register (username, f_name, l_name, Email, password) VALUES (?, ?, ?, ?, ?)"
-
+    const insertQuery = "INSERT INTO register (username, f_name, l_name, Email, password) VALUES (?, ?, ?, ?, ?)"
+   
    db.query(insertQuery, [username, f_name, l_name, email, password], (err, result)=>{
        if (err){
            console.log(err)
        }
    })
-    
+
+})
+
+app.post('/login', (req, res)=>{
+    const username = req.body.username;
+    const password = req.body.password;
+
+    const selectQuery = "SELECT * FROM register WHERE username=? AND password=?"
+
+    db.query(selectQuery, [username, password], (err, result)=>{
+        if(err){
+            res.send({err:err})
+        }
+
+        if(result.length > 0){
+            res.send(result)
+        }else{
+            res.send({message:"wrong username/password combination"})
+        }
+    })
 })
 
 app.listen('3001', ()=>{console.log('we are on the localhost:3001')})

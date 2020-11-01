@@ -2,6 +2,7 @@ import React, { Component} from 'react'
 import {Button, Form, Row, Container, Col} from 'react-bootstrap'
 import axios from 'axios'
 
+
 class Register extends Component {
     constructor(){
         super()
@@ -10,6 +11,7 @@ class Register extends Component {
             l_name:'', 
             username:'', 
             password:'',
+            password1: '',
             email:'',
         }
     }
@@ -20,14 +22,30 @@ class Register extends Component {
             [nam]: val
         })
     }
-    submit = ()=>{
-        axios.post('http://localhost:3001/register', this.state)
-        .then(()=>{
-            alert('submit was succeed')
-        })
+    submit = (e)=>{
+        //checking password correction and fill the all form
+        //after regestratioin redirect to login
+        if(this.state.password === this.state.password1){
+            if(this.state.email || this.state.username){
+                axios.post('http://localhost:3001/register', this.state)
+                .then(()=>{
+                    alert('submit was succeed')
+                })
+                setTimeout(()=>{
+                    this.props.history.push('/login')
+                }, 1000)
+            }else{
+                e.preventDefault()
+                alert("Please fill all form")
+            }
+        }else{
+            e.preventDefault()
+            alert("Entered Passwords are not match\nPlease try again")
+        }
+   
     }
     render(){
-        console.log(this.state)
+    
         return (
             <>
             <Container>
@@ -38,22 +56,22 @@ class Register extends Component {
                     
                     <Form.Group >
                     <Form.Label>First Name</Form.Label>
-                    <Form.Control name='f_name' type="text" placeholder="First Name" onChange={this.changeHandler}/>
+                    <Form.Control name='f_name' type="text" placeholder="First Name" onChange={this.changeHandler} required/>
                     </Form.Group>
 
                     <Form.Group >
                     <Form.Label>Last Name</Form.Label>
-                    <Form.Control name='l_name' type="text" placeholder="Last Name" onChange={this.changeHandler}/>
+                    <Form.Control name='l_name' type="text" placeholder="Last Name" onChange={this.changeHandler} required/>
                     </Form.Group>
 
                     <Form.Group >
                     <Form.Label>User Name</Form.Label>
-                    <Form.Control name='username' type="text" placeholder="User Name" onChange={this.changeHandler}/>
+                    <Form.Control name='username' type="text" placeholder="User Name" onChange={this.changeHandler} required/>
                     </Form.Group>
 
                     <Form.Group >
                     <Form.Label>Email address</Form.Label>
-                    <Form.Control name='email' type="email" placeholder="Enter Email" onChange={this.changeHandler}/>
+                    <Form.Control name='email' type="email" placeholder="Enter Email" onChange={this.changeHandler} required/>
                     <Form.Text className="text-muted">
                     We'll never share your email with anyone else.
                     </Form.Text>
@@ -61,12 +79,12 @@ class Register extends Component {
                     </Form.Group>
                     <Form.Group >
                     <Form.Label>Password</Form.Label>
-                    <Form.Control name='password' type="password" placeholder="Password" onChange={this.changeHandler} />
+                    <Form.Control name='password' type="password" placeholder="Password" onChange={this.changeHandler} required />
                     </Form.Group>
 
                     <Form.Group >
                     <Form.Label>Confirm Password</Form.Label>
-                    <Form.Control type="password" placeholder="Password" />
+                    <Form.Control name='password1' type="password"  onChange={this.changeHandler} placeholder="Password" />
                     </Form.Group>
                    
                     <Button onClick={this.submit} variant="primary" type="submit">
