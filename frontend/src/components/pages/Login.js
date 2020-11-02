@@ -7,7 +7,10 @@ class Login extends Component{
         super()
         this.state ={
             username: '', 
-            password:''
+            password:'', 
+            logedInName:'', 
+            logedFailed:'',
+            flag: null,
         }
     }
     changeHandler = (ev)=>{
@@ -21,12 +24,38 @@ class Login extends Component{
         e.preventDefault()
         axios.post('http://localhost:3001/login', this.state)
                 .then((response)=>{
-                   console.log(response.data)
+                   if(response.data.length){
+                    this.setState({
+                            logedInName: response.data[0].f_name.toUpperCase()+ ' ' + response.data[0].l_name.toUpperCase(),
+                            flag: 1
+                            })  
+                       setTimeout(()=>{
+                        this.props.history.push('/')
+                       }, 1000)
+                   }else{
+                    this.setState({
+                        logedFailed: response.data.message,
+                        flag: 0
+                    })
+               
+                    }
+                
                 })
 
         
     }
     render(){
+        //showing welcome or wrong username or password message
+        let loginStatus;
+        if(this.state.flag === 1){
+        loginStatus = <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Welcome {this.state.logedInName}</strong>
+                    </div>
+        } else if(this.state.flag === 0){
+        loginStatus =   <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>{this.state.logedFailed}</strong><br/> Please try again!
+                        </div>
+        }      
         return (
             <>
                 <Container className="my-5">
@@ -49,7 +78,7 @@ class Login extends Component{
                         </Button>
                         </Form>
                     </Col>
-                    <Col></Col>
+                    <Col>{loginStatus}</Col>
                     </Row>
                    
                 </Container>
