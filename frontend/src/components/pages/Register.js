@@ -13,6 +13,8 @@ class Register extends Component {
             password:'',
             password1: '',
             email:'',
+            message:'', 
+            flag: null,
         }
     }
     changeHandler = (ev)=>{
@@ -23,17 +25,31 @@ class Register extends Component {
         })
     }
     submit = (e)=>{
-        //checking password correction and fill the all form
-        //after regestratioin redirect to login
+        // checking password correction and fill the all form
+        // after regestratioin redirect to login
+        e.preventDefault()
         if(this.state.password === this.state.password1){
             if(this.state.email || this.state.username){
                 axios.post('http://localhost:3001/register', this.state)
-                .then(()=>{
-                    alert('submit was succeed')
+                .then((response)=>{
+                
+                    if(response.data.message){
+                        this.setState({
+                            message:response.data.message,
+                            flag: 1
+                        })
+                        setTimeout(()=>{
+                            this.props.history.push('/login')
+                        }, 1500)
+                    }else{
+                        this.setState({
+                            message:response.data.warning, 
+                            flag: 2 
+                        })
+                    }
+                    
                 })
-                setTimeout(()=>{
-                    this.props.history.push('/login')
-                }, 1000)
+                
             }else{
                 e.preventDefault()
                 alert("Please fill all form")
@@ -42,15 +58,25 @@ class Register extends Component {
             e.preventDefault()
             alert("Entered Passwords are not match\nPlease try again")
         }
-   
+    
     }
     render(){
-    
+    let message;
+    if(this.state.flag === 1){
+        message = <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>{this.state.message}</strong><br/> 
+                </div>
+    }else if(this.state.flag === 2){
+        message = <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>{this.state.message}</strong><br/> 
+                    Forget Your password?<a href='#'>Click Here</a>
+                </div>
+    }
         return (
             <>
             <Container>
                 <Row>
-                <Col></Col>
+                <Col>{message}</Col>
                 <Col>
                 <Form>
                     
