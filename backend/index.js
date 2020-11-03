@@ -27,21 +27,41 @@ app.post('/register', (req, res)=>{
     const l_name = req.body.l_name;
     const email = req.body.email;
     const password = req.body.password
-    const insertQuery = "INSERT INTO register (username, f_name, l_name, Email, password) VALUES (?, ?, ?, ?, ?)"
 
-    //sending hashed password to the database.
-    bcrypt.hash(password, saltRound, (err, hash)=>{
+    const insertQuery = "INSERT INTO register (username, f_name, l_name, Email, password) VALUES (?, ?, ?, ?, ?)"
+    const checkUniqUsername = "SELECT * FROM register where username=?"
+
+    //checking if we have the entered username and email in database
+    db.query(checkUniqUsername, username, (err, userres)=>{
         if(err){
             console.log(err)
         }
 
-        db.query(insertQuery, [username, f_name, l_name, email, hash], (err, result)=>{
-            if (err){
-                console.log(err)
+        if(userres.length > 0){
+            if(userres[0].Email == email){
+                 res.send({warning:"This user with this Email address already exist"})
+            }else{
+                res.send({warning:"All information is correct just use another Username"})
             }
-        })
+        
+        }else{
+            //sending hashed password to the database.
+            bcrypt.hash(password, saltRound, (err, hash)=>{
+                if(err){
+                    console.log(err)
+                }
 
+                db.query(insertQuery, [username, f_name, l_name, email, hash], (err, result)=>{
+                    if (err){
+                        console.log(err)
+                    }
+                    res.send({message:"You successfully registred"})
+            })
+
+})
+        }
     })
+   
 
     
    
