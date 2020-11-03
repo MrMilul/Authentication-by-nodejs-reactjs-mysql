@@ -31,7 +31,7 @@ class Login extends Component{
                             })  
                        setTimeout(()=>{
                         this.props.history.push('/')
-                       }, 1000)
+                       }, 1500)
                    }else{
                     this.setState({
                         logedFailed: response.data.message,
