@@ -3,14 +3,30 @@ const app = express();
 const mysql = require('mysql');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 
 //hasshing password
 const bcrypt = require('bcrypt');
 const saltRound = 10; 
 
-app.use(cors()); 
+app.use(cors({
+    origin:["http://localhost:3000"], 
+    methods:["GET", "POST"],
+    credentials: true
+})); 
+app.use(cookieParser())
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended:true}))
+app.use(session({
+    key:"userId", 
+    secret: "subscribe", 
+    resave: false, 
+    saveUninitialized: false, 
+    cookie:{
+        expires: 60 * 60 * 24 
+    }
+}))
 
 const db = mysql.createPool({
     host: 'localhost',
@@ -86,6 +102,7 @@ app.post('/login', (req, res)=>{
                     console.log(error)
                 }
                 if(response){
+                    req.session.user = result; 
                     res.send(result)
                 }else{
                     res.send({message:"Wrong Username/Password combination"})
@@ -97,4 +114,11 @@ app.post('/login', (req, res)=>{
     })
 })
 
+app.get('/login', (req, res)=>{
+    if(req.session.user){
+        res.send({logedIn:true, f_name:req.session.user[0].f_name, l_name:req.session.user[0].l_name})
+    }else{
+        res.send({logedIn:false})
+    }
+} )
 app.listen('3001', ()=>{console.log('we are on the localhost:3001')})

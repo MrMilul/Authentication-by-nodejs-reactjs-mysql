@@ -41,10 +41,19 @@ class Login extends Component{
                     }
                 
                 })
-
-        
     }
+    // componentDidMount() {
+    //     axios.get("http://localhost:3001/login").then((response)=>{
+    //             if(response.data.logedIn){
+    //                 // this.setState({
+    //                 //     user: response.data
+    //                 // })
+    //                 console.log(response)
+    //             }
+    //         })
+    // }
     render(){
+        axios.defaults.withCredentials = true;
         //showing welcome or wrong username or password message
         let loginStatus;
         if(this.state.flag === 1){
